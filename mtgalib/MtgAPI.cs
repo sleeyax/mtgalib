@@ -77,16 +77,14 @@ namespace mtgalib
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public object Login(string username, string password)
+        public dynamic Login(string username, string password)
         {
-            NameValueCollection data = new NameValueCollection
+            return Login(new NameValueCollection
             {
                 {"grant_type", "password"},
                 {"username", username},
-                {"password", password},
-            };
-
-            return Login(data);
+                {"password", password}
+            });
         }
 
         /// <summary>
@@ -96,13 +94,11 @@ namespace mtgalib
         /// <returns></returns>
         public dynamic Login(string refreshToken)
         {
-            NameValueCollection data = new NameValueCollection
+            return Login(new NameValueCollection
             {
                 {"grant_type", "refresh_token"},
                 {"refresh_token", refreshToken}
-            };
-
-            return Login(data);
+            });
         }
     }
 }
