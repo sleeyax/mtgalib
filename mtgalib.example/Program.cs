@@ -12,7 +12,8 @@ namespace mtgalib.example
         {
             // Credentials credentials = new Credentials("token");
             Credentials credentials = new Credentials("username", "password");
-            if (credentials.Verify())
+            bool verified = credentials.VerifyAsync().GetAwaiter().GetResult();
+            if (verified)
             {
                 Console.WriteLine(credentials.RefreshToken);
                 Console.WriteLine(credentials.AccessToken);
