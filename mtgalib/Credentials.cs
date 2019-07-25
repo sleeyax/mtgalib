@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Security;
+using System.Threading.Tasks;
 
 namespace mtgalib
 {
@@ -27,9 +28,9 @@ namespace mtgalib
             RefreshToken = refreshToken;
         }
 
-        public bool Verify()
+        public async Task<bool> VerifyAsync()
         {
-            dynamic jsonResponse = RefreshToken != null ? _api.Login(RefreshToken) : _api.Login(_username, _password);
+            dynamic jsonResponse = RefreshToken != null ? await _api.LoginAsync(RefreshToken) : await _api.LoginAsync(_username, _password);
 
             if (jsonResponse.code == 401)
                 return false;

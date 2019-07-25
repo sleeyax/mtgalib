@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Security.Policy;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace mtgalib
@@ -25,23 +26,23 @@ namespace mtgalib
         }
 
         /// <summary>
-        /// Send a POST request to an endpoint
+        /// Send a asynchronous POST request to an endpoint
         /// </summary>
         /// <param name="url"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        private string Post(string url, NameValueCollection data)
+        private async Task<string> PostAsync(string url, NameValueCollection data)
         {
-            byte[] responseBytes = _wc.UploadValues(url, "POST", data);
+            byte[] responseBytes = await _wc.UploadValuesTaskAsync(url, "POST", data);
             return Encoding.UTF8.GetString(responseBytes);
         }
 
         /// <summary>
-        /// Login
+        /// Login asynchronously
         /// </summary>
         /// <param name="data">data to send to the login endpoint</param>
         /// <returns></returns>
-        private object Login(NameValueCollection data)
+        private async Task<dynamic> LoginAsync(NameValueCollection data)
         {
             try
             {
@@ -50,7 +51,7 @@ namespace mtgalib
                 string basic = Helpers.Base64Encode($"{_accountSystemId}:{_accountSystemSecret}");
                 _wc.Headers["Authorization"] = $"Basic {basic}";
 
-                string response = Post($"{_url}/auth/oauth/token", data);
+                string response = await PostAsync($"{_url}/auth/oauth/token", data);
 
                 return JsonConvert.DeserializeObject(response);
             }
@@ -72,14 +73,14 @@ namespace mtgalib
         }
 
         /// <summary>
-        /// Login using username & password
+        /// Login asynchronously using username & password
         /// </summary>
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public dynamic Login(string username, string password)
+        public Task<dynamic> LoginAsync(string username, string password)
         {
-            return Login(new NameValueCollection
+            return LoginAsync(new NameValueCollection
             {
                 {"grant_type", "password"},
                 {"username", username},
@@ -88,13 +89,13 @@ namespace mtgalib
         }
 
         /// <summary>
-        /// Login using refresh token
+        /// Login asynchronously using refresh token
         /// </summary>
         /// <param name="refreshToken"></param>
         /// <returns></returns>
-        public dynamic Login(string refreshToken)
+        public Task<dynamic> LoginAsync(string refreshToken)
         {
-            return Login(new NameValueCollection
+            return LoginAsync(new NameValueCollection
             {
                 {"grant_type", "refresh_token"},
                 {"refresh_token", refreshToken}
