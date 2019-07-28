@@ -54,9 +54,13 @@
     <Compile Include="Player\PlayerEnvironment.cs" />
     <Compile Include="Player\PlayerEnvironmentType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Server\JsonResponse.cs" />
     <Compile Include="Server\MtgaServer.cs" />
+    <Compile Include="Server\RpcResponse.cs" />
+    <Compile Include="Server\ServerErrorCode.cs" />
     <Compile Include="Server\TcpConnection.cs" />
     <Compile Include="Server\TcpConnectionCloseType.cs" />
+    <Compile Include="Version.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
