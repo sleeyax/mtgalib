@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using mtgalib.Player;
@@ -20,10 +21,6 @@ namespace mtgalib.example
             if (verified)
             {
                 Console.WriteLine("Logged in!");
-                Console.WriteLine(credentials.RefreshToken);
-                Console.WriteLine(credentials.AccessToken);
-                Console.WriteLine(credentials.DisplayName);
-                Console.WriteLine(credentials.PersonaId);
                 _ticket = credentials.AccessToken;
             }
             else
@@ -44,6 +41,8 @@ namespace mtgalib.example
 
             // Register event handlers
             server.SetOnMsgSentAction((bytes, offset, count) => Console.WriteLine("-> " + Encoding.UTF8.GetString(bytes, offset, count)));
+            server.SetOnMsgReceivedAction((bytes, offset, count) => Console.WriteLine("<- " + Encoding.UTF8.GetString(bytes, offset, count)));
+
 
             // Connect to server
             Console.WriteLine("Connecting to server...");
@@ -53,8 +52,8 @@ namespace mtgalib.example
 
             // Authenticate user
             await server.AuthenticateAsyncTask(_ticket);
-            string response = await server.ReadResponseTask();
-            Console.WriteLine("<- " + response);
+            JsonRpcResponse response = await server.ReadResponseTask();
+            Console.WriteLine("Session id: " + response.result.GetPayloadValue<string>("sessionId"));
 
         }
 

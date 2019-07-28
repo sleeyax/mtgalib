@@ -34,16 +34,21 @@ namespace mtgalib.Server
 
         public void SetOnMsgSentAction(Action<byte[], int, int> action)
         {
-            _tcpConnection.OnMsgSent = action;
+            _tcpConnection.OnMsgSent += action;
         }
 
-        public Task<string> ReadResponseTask()
+        public void SetOnMsgReceivedAction(Action<byte[], int, int> action)
         {
-            TaskCompletionSource<string> taskCompletionSource = new TaskCompletionSource<string>();
-            _tcpConnection.OnMsgReceived = (bytes, offset, length) =>
+            _tcpConnection.OnMsgReceived += action;
+        }
+
+        public Task<JsonRpcResponse> ReadResponseTask()
+        {
+            TaskCompletionSource<JsonRpcResponse> taskCompletionSource = new TaskCompletionSource<JsonRpcResponse>();
+            _tcpConnection.OnMsgReceived += (bytes, offset, length) =>
             {
                 string msg = Encoding.UTF8.GetString(bytes, offset, length);
-                taskCompletionSource.SetResult(msg);
+                taskCompletionSource.SetResult(JsonConvert.DeserializeObject<JsonRpcResponse>(msg));
             };
 
             return taskCompletionSource.Task;
