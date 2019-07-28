@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.SqlServer.Server;
+using mtgalib.Player;
 using mtgalib.Server;
 
 namespace mtgalib.example
@@ -31,16 +32,36 @@ namespace mtgalib.example
             Console.ReadKey();
             */
 
-           TcpConnTest();
-
+           // TcpConnTest();
+           DoYourThing();
            Console.ReadKey();
         }
 
-        static async void TcpConnTest()
+        static async Task DoYourThing()
+        {
+            PlayerEnvironment environment = PlayerEnvironment.GetEnvironment();
+            MtgaServer server = new MtgaServer(environment);
+
+            Console.WriteLine("Connecting to server...");
+            bool connected = await server.ConnectTask();
+            if (connected)
+                Console.WriteLine("Connected!");
+
+            string cmd = "hello";
+            server.Send(cmd);
+            Console.WriteLine("-> " + cmd);
+
+            string response = await server.ReadResponseTask();
+            Console.WriteLine("<- " + response);
+
+            Console.ReadKey();
+        }
+
+        static void TcpConnTest()
         {
             TcpConnection tcp = new TcpConnection();
             tcp.Connect("client.arenagame-b.east.magic-the-gathering-arena.com", 9405);
-            tcp.OnConnected += () => Console.WriteLine("connected");
+            tcp.OnConnected += (b) => Console.WriteLine("connected");
             tcp.OnClose += (type) => Console.WriteLine("Disconnected");
             tcp.OnMsgReceived += (bytes, i, arg3) => Console.WriteLine(Encoding.UTF8.GetString(bytes, i, arg3));
            
