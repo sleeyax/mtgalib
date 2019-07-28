@@ -33,8 +33,8 @@ namespace mtgalib.example
             */
 
            // TcpConnTest();
-           DoYourThing();
-           Console.ReadKey();
+          DoYourThing();
+         // Console.ReadKey();
         }
 
         static async Task DoYourThing()
@@ -55,22 +55,6 @@ namespace mtgalib.example
             Console.WriteLine("<- " + response);
 
             Console.ReadKey();
-        }
-
-        static void TcpConnTest()
-        {
-            TcpConnection tcp = new TcpConnection();
-            tcp.Connect("client.arenagame-b.east.magic-the-gathering-arena.com", 9405);
-            tcp.OnConnected += (b) => Console.WriteLine("connected");
-            tcp.OnClose += (type) => Console.WriteLine("Disconnected");
-            tcp.OnMsgReceived += (bytes, i, arg3) => Console.WriteLine(Encoding.UTF8.GetString(bytes, i, arg3));
-           
-            while (tcp.Connected == false)
-            {
-
-            }
-            string msg = "{\"jsonrpc\":\"2.0\",\"method\":\"Derp\",\"params\":{},\"id\":\"56\"}";
-            tcp.SendAsync( Encoding.UTF8.GetBytes(msg));
         }
     }
 }

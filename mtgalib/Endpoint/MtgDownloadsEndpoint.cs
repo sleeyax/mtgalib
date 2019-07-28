@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace mtgalib
 {
-    public class MtgDownloadsEndpoint : BaseEndpoint
+    internal class MtgDownloadsEndpoint : BaseEndpoint
     {
         public const string PLATFORM_WINDOWS = "Windows32";
 

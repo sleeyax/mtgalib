@@ -1,6 +1,6 @@
 ﻿namespace mtgalib.Server
 {
-    public enum TcpConnectionCloseType
+    internal enum TcpConnectionCloseType
     {
         Unexpected,
         Expected,

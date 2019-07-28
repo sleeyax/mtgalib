@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace mtgalib
 {
-    public class MtgAssetsEndpoint : BaseEndpoint
+    internal class MtgAssetsEndpoint : BaseEndpoint
     {
         
         public MtgAssetsEndpoint()

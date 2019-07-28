@@ -2,7 +2,7 @@
 
 namespace mtgalib
 {
-    public abstract class BaseEndpoint
+    internal abstract class BaseEndpoint
     {
         protected string _url;
         protected WebClient _wc;

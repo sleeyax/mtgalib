@@ -3,7 +3,7 @@ using System.Text;
 
 namespace mtgalib
 {
-    public class Helpers
+    internal class Helpers
     {
         public static string Base64Encode(string plaintext)
         {

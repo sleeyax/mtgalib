@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace mtgalib
 {
-    public class MtgAPI : BaseEndpoint
+    internal class MtgAPI : BaseEndpoint
     {
         private string _accountSystemId;
         private string _accountSystemSecret;

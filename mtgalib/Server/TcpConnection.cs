@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace mtgalib.Server
 {
-    public class TcpConnection
+    internal class TcpConnection
     {
         public Action<TcpConnectionCloseType> OnClose;
         public Action<bool> OnConnected;
