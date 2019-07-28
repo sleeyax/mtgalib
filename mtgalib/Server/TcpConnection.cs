@@ -13,7 +13,7 @@ namespace mtgalib.Server
     public class TcpConnection
     {
         public event Action<TcpConnectionCloseType> OnClose;
-        public event Action OnConnected;
+        public event Action<bool> OnConnected;
         public event Action<byte[], int, int> OnMsgReceived;
         public string ConnectionStatus { get; private set; }
         public bool Connected => _socket != null && _socket.Connected;
@@ -157,7 +157,7 @@ namespace mtgalib.Server
             }
 
             ConnectionStatus = "Connected";
-            OnConnected?.Invoke();
+            OnConnected?.Invoke(true);
             TrySendNextMessageThread();
             StartRead(0);
         }

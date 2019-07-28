@@ -4,10 +4,9 @@ namespace mtgalib.Player
 {
     public class PlayerCredentials
     {
-
-        private MtgAPI _api = new MtgAPI();
         private readonly string _password;
         private readonly string _username;
+
         public string RefreshToken { get; private set; }
         public string AccessToken { get; private set; }
         public string DisplayName { get; private set; }
@@ -25,9 +24,11 @@ namespace mtgalib.Player
             RefreshToken = refreshToken;
         }
 
-        public async Task<bool> VerifyAsync()
+        public async Task<bool> VerifyAsyncTask()
         {
-            dynamic jsonResponse = RefreshToken != null ? await _api.LoginAsync(RefreshToken) : await _api.LoginAsync(_username, _password);
+            MtgAPI api = new MtgAPI(PlayerEnvironment.GetEnvironment());
+
+            dynamic jsonResponse = RefreshToken != null ? await api.LoginAsyncTask(RefreshToken) : await api.LoginAsyncTask(_username, _password);
 
             if (jsonResponse.code == 401)
                 return false;

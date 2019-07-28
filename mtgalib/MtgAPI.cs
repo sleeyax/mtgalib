@@ -32,7 +32,7 @@ namespace mtgalib
         /// <param name="url"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        private async Task<string> PostAsync(string url, NameValueCollection data)
+        private async Task<string> PostAsyncTask(string url, NameValueCollection data)
         {
             byte[] responseBytes = await _wc.UploadValuesTaskAsync(url, "POST", data);
             return Encoding.UTF8.GetString(responseBytes);
@@ -43,7 +43,7 @@ namespace mtgalib
         /// </summary>
         /// <param name="data">data to send to the login endpoint</param>
         /// <returns></returns>
-        private async Task<dynamic> LoginAsync(NameValueCollection data)
+        private async Task<dynamic> LoginAsyncTask(NameValueCollection data)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace mtgalib
                 string basic = Helpers.Base64Encode($"{_accountSystemId}:{_accountSystemSecret}");
                 _wc.Headers["Authorization"] = $"Basic {basic}";
 
-                string response = await PostAsync($"{_url}/auth/oauth/token", data);
+                string response = await PostAsyncTask($"{_url}/auth/oauth/token", data);
 
                 return JsonConvert.DeserializeObject(response);
             }
@@ -79,9 +79,9 @@ namespace mtgalib
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public Task<dynamic> LoginAsync(string username, string password)
+        public Task<dynamic> LoginAsyncTask(string username, string password)
         {
-            return LoginAsync(new NameValueCollection
+            return LoginAsyncTask(new NameValueCollection
             {
                 {"grant_type", "password"},
                 {"username", username},
@@ -94,9 +94,9 @@ namespace mtgalib
         /// </summary>
         /// <param name="refreshToken"></param>
         /// <returns></returns>
-        public Task<dynamic> LoginAsync(string refreshToken)
+        public Task<dynamic> LoginAsyncTask(string refreshToken)
         {
-            return LoginAsync(new NameValueCollection
+            return LoginAsyncTask(new NameValueCollection
             {
                 {"grant_type", "refresh_token"},
                 {"refresh_token", refreshToken}

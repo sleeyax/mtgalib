@@ -61,11 +61,11 @@ namespace mtgalib.Player
             }
         }
 
-        public static async Task<PlayerEnvironment> GetDefaultEnvironment()
+        public static async Task<PlayerEnvironment> GetDefaultEnvironmentAsyncTask()
         {
             // Download default ProdUri from the MTGA assets endpoint
             MtgAssetsEndpoint assetsEndpoint = new MtgAssetsEndpoint();
-            string prodUri = await assetsEndpoint.GetProdUri();
+            string prodUri = await assetsEndpoint.GetProdUriAsyncTask();
             prodUri = prodUri.Replace("wss://", "").Replace("ws://", "").ToLower();
             string[] parts = prodUri.Split('/');
 
