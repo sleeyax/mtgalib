@@ -3,24 +3,30 @@ using Newtonsoft.Json.Linq;
 
 namespace mtgalib.Server
 {
-    public class JsonResponseResult
+    public class JsonRpcResponseResult
     {
         public string method { get; set; }
         public JToken payload { get; set; }
+
+        public T GetPayloadValue<T>(string key)
+        {
+            return payload.Value<T>(key);
+        }
     }
 
-    public class JsonResponseError
+    public class JsonRpcResponseError
     {
         public ServerErrorCode code { get; set; }
         public string message { get; set; }
         public Dictionary<string, object> data { get; set; }
     }
 
-    public class JsonResponse
+    public class JsonRpcResponse
     {
         public string jsonrpc { get; set; }
         public int id { get; set; }
-        public JsonResponseResult result { get; set; }
-        public JsonResponseError error { get; set; }
+        public JsonRpcResponseResult result { get; set; }
+        public JsonRpcResponseError error { get; set; }
+
     }
 }
