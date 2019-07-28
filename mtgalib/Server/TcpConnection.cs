@@ -12,9 +12,9 @@ namespace mtgalib.Server
 {
     public class TcpConnection
     {
-        public event Action<TcpConnectionCloseType> OnClose;
-        public event Action<bool> OnConnected;
-        public event Action<byte[], int, int> OnMsgReceived;
+        public Action<TcpConnectionCloseType> OnClose;
+        public Action<bool> OnConnected;
+        public Action<byte[], int, int> OnMsgReceived;
         public string ConnectionStatus { get; private set; }
         public bool Connected => _socket != null && _socket.Connected;
 

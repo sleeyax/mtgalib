@@ -21,7 +21,7 @@ namespace mtgalib.Server
         {
             _tcpConnection.Connect(_host, _port);
             TaskCompletionSource<bool> taskCompletionSource = new TaskCompletionSource<bool>();
-            _tcpConnection.OnConnected += b => taskCompletionSource.SetResult(b);
+            _tcpConnection.OnConnected = b => taskCompletionSource.SetResult(b);
 
             return taskCompletionSource.Task;
         }
@@ -29,7 +29,7 @@ namespace mtgalib.Server
         public Task<string> ReadResponseTask()
         {
             TaskCompletionSource<string> taskCompletionSource = new TaskCompletionSource<string>();
-            _tcpConnection.OnMsgReceived += (bytes, offset, length) =>
+            _tcpConnection.OnMsgReceived = (bytes, offset, length) =>
             {
                 string msg = Encoding.UTF8.GetString(bytes, offset, length);
                 taskCompletionSource.SetResult(msg);
