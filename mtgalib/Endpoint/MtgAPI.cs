@@ -17,7 +17,7 @@ namespace mtgalib.Endpoint
         {
             _url = "https://api.platform.wizards.com";
             _accountSystemId = playerEnvironment.ClientId;
-            _accountSystemSecret = playerEnvironment.ClientId;
+            _accountSystemSecret = playerEnvironment.ClientSecret;
         }
 
         /// <summary>
