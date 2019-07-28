@@ -11,17 +11,14 @@ using Newtonsoft.Json;
 
 namespace mtgalib
 {
-    public class MtgAPI
+    public class MtgAPI : BaseEndpoint
     {
-        private readonly string _url = "https://api.platform.wizards.com";
         private string _accountSystemId;
         private string _accountSystemSecret;
-        private WebClient _wc;
-
 
         public MtgAPI(PlayerEnvironment playerEnvironment)
         {
-            _wc = new WebClient();
+            _url = "https://api.platform.wizards.com";
             _accountSystemId = playerEnvironment.ClientId;
             _accountSystemSecret = playerEnvironment.ClientId;
         }

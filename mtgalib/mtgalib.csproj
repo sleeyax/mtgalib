@@ -44,10 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MtgAssetsEndpoint.cs" />
+    <Compile Include="Endpoint\BaseEndpoint.cs" />
+    <Compile Include="Endpoint\MtgAssetsEndpoint.cs" />
+    <Compile Include="Endpoint\MtgDownloadsEndpoint.cs" />
     <Compile Include="Player\PlayerCredentials.cs" />
     <Compile Include="Helpers.cs" />
-    <Compile Include="MtgAPI.cs" />
+    <Compile Include="Endpoint\MtgAPI.cs" />
     <Compile Include="DeprecatedMtgaServer.cs" />
     <Compile Include="Player\PlayerEnvironment.cs" />
     <Compile Include="Player\PlayerEnvironmentType.cs" />
