@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.SqlServer.Server;
 using mtgalib.Player;
 using mtgalib.Server;
 
@@ -12,49 +8,55 @@ namespace mtgalib.example
 {
     class Program
     {
+
+        private static string _ticket;
+
         static void Main(string[] args)
         {
-            // Credentials credentials = new Credentials("token");
-            /*Credentials credentials = new Credentials("username", "password");
-            bool verified = credentials.VerifyAsync().GetAwaiter().GetResult();
+            // PlayerCredentials credentials = new PlayerCredentials("token");
+            PlayerCredentials credentials = new PlayerCredentials("username", "password");
+            Console.WriteLine("Authenticating...");
+            bool verified = credentials.VerifyAsyncTask().GetAwaiter().GetResult();
             if (verified)
             {
+                Console.WriteLine("Logged in!");
                 Console.WriteLine(credentials.RefreshToken);
                 Console.WriteLine(credentials.AccessToken);
                 Console.WriteLine(credentials.DisplayName);
                 Console.WriteLine(credentials.PersonaId);
+                _ticket = credentials.AccessToken;
             }
             else
             {
                 Console.WriteLine("Invalid credentials!");
+                Console.ReadKey();
+                return;
             }
-            
-            Console.ReadKey();
-            */
 
-           // TcpConnTest();
-          DoYourThing();
-         // Console.ReadKey();
+            DoYourThing();
+            Console.ReadKey();
         }
 
         static async Task DoYourThing()
         {
-            PlayerEnvironment environment = PlayerEnvironment.GetEnvironment();
+            PlayerEnvironment environment = PlayerEnvironment.GetEnvironment(PlayerEnvironmentType.ProdB);
             MtgaServer server = new MtgaServer(environment);
 
+            // Register event handlers
+            server.SetOnMsgSentAction((bytes, offset, count) => Console.WriteLine("-> " + Encoding.UTF8.GetString(bytes, offset, count)));
+
+            // Connect to server
             Console.WriteLine("Connecting to server...");
             bool connected = await server.ConnectTask();
             if (connected)
                 Console.WriteLine("Connected!");
 
-            string cmd = "hello";
-            server.Send(cmd);
-            Console.WriteLine("-> " + cmd);
-
+            // Authenticate user
+            await server.AuthenticateAsyncTask(_ticket);
             string response = await server.ReadResponseTask();
             Console.WriteLine("<- " + response);
 
-            Console.ReadKey();
         }
+
     }
 }
