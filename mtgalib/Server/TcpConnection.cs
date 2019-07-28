@@ -15,6 +15,7 @@ namespace mtgalib.Server
         public Action<TcpConnectionCloseType> OnClose;
         public Action<bool> OnConnected;
         public Action<byte[], int, int> OnMsgReceived;
+        public Action<byte[], int, int> OnMsgSent;
         public string ConnectionStatus { get; private set; }
         public bool Connected => _socket != null && _socket.Connected;
 
@@ -32,7 +33,6 @@ namespace mtgalib.Server
         private SocketAsyncEventArgs _socketAsyncEventArgs;
         private string _host;
         private int _port;
-        private IPAddress _addr;
         private bool _stopSendThread;
 
         public TcpConnection()
@@ -134,7 +134,7 @@ namespace mtgalib.Server
             catch (Exception ex)
             {
                 Close(TcpConnectionCloseType.Unexpected);
-                throw new Exception("SSL authentication failed");
+                throw new Exception("SSL authentication failed", ex);
             }
         }
 
@@ -193,6 +193,7 @@ namespace mtgalib.Server
                                 int num2 = Math.Min(_outgoingMessageRemainingBytes, (num == 0) ? 5115 : 5120);
                                 Array.Copy(_outgoingMessage, num, _sendBuffer, (num == 0) ? 5 : 0, num2);
                                 _ssl.Write(_sendBuffer, 0, (num == 0) ? (num2 + 5) : num2);
+                                OnMsgSent?.Invoke(_sendBuffer, 0, (num == 0) ? (num2 + 5) : num2);
                                 _outgoingMessageRemainingBytes -= num2;
                                 num += num2;
                             }
@@ -209,7 +210,7 @@ namespace mtgalib.Server
                     catch (Exception ex)
                     {
                         Close(TcpConnectionCloseType.Unexpected);
-                        throw new Exception("Unexpected error while trying to send next message in queue");
+                        throw new Exception("Unexpected error while trying to send next message in queue", ex);
                     }
                 }
             }).Start();
@@ -257,12 +258,13 @@ namespace mtgalib.Server
             try
             {
                 _ssl.Write(_sendBuffer, offset, count);
+                OnMsgSent?.Invoke(_sendBuffer, offset, count);
                 TrySendNextMsg();
             }
             catch (Exception ex)
             {
                 Close(TcpConnectionCloseType.Unexpected);
-                throw new Exception("Error when writing to SSL stream");
+                throw new Exception("Error when writing to SSL stream", ex);
             }
         }
 
@@ -275,7 +277,7 @@ namespace mtgalib.Server
             catch (Exception ex)
             {
                 Close(TcpConnectionCloseType.Unexpected);
-                throw new Exception("Error when reading from SSL stream");
+                throw new Exception("Error when reading from SSL stream", ex);
             }
         }
 

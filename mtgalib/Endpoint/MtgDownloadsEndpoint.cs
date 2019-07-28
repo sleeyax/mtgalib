@@ -18,6 +18,7 @@ namespace mtgalib.Endpoint
         {
             string response = await _wc.DownloadStringTaskAsync($"{_url}/Live/{platform}/version");
             VersionResponseJson json = JsonConvert.DeserializeObject<VersionResponseJson>(response);
+            // Format will be: 0.1.1595.718832 where 1595.718832 is the version we need
             return json.Versions.Keys.Max();
         }
 
