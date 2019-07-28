@@ -2,9 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
-namespace mtgalib
+namespace mtgalib.Endpoint
 {
     internal class MtgDownloadsEndpoint : BaseEndpoint
     {

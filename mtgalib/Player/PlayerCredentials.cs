@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using mtgalib.Endpoint;
 
 namespace mtgalib.Player
 {

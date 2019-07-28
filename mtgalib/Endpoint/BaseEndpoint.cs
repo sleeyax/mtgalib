@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace mtgalib
+namespace mtgalib.Endpoint
 {
     internal abstract class BaseEndpoint
     {

@@ -1,7 +1,6 @@
-﻿using System.Net;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace mtgalib
+namespace mtgalib.Endpoint
 {
     internal class MtgAssetsEndpoint : BaseEndpoint
     {

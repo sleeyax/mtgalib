@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.IO;
 using System.Net;
-using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using mtgalib.Player;
 using Newtonsoft.Json;
 
-namespace mtgalib
+namespace mtgalib.Endpoint
 {
     internal class MtgAPI : BaseEndpoint
     {
