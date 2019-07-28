@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.SqlServer.Server;
+using mtgalib.Server;
 
 namespace mtgalib.example
 {
@@ -35,7 +36,7 @@ namespace mtgalib.example
            Console.ReadKey();
         }
 
-        static void TcpConnTest()
+        static async void TcpConnTest()
         {
             TcpConnection tcp = new TcpConnection();
             tcp.Connect("client.arenagame-b.east.magic-the-gathering-arena.com", 9405);

@@ -1,4 +1,4 @@
-﻿namespace mtgalib
+﻿namespace mtgalib.Server
 {
     public enum TcpConnectionCloseType
     {

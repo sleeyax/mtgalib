@@ -6,6 +6,7 @@ using System.Net;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using mtgalib.Player;
 using Newtonsoft.Json;
 
 namespace mtgalib
@@ -13,16 +14,16 @@ namespace mtgalib
     public class MtgAPI
     {
         private readonly string _url = "https://api.platform.wizards.com";
-        // clientId
-        private readonly string _accountSystemId = "N8QFG8NEBJ5T35FB";
-        // clientSecret
-        private readonly string _accountSystemSecret = "VMK1RE8YK6YR4EABJU91";
+        private string _accountSystemId;
+        private string _accountSystemSecret;
         private WebClient _wc;
 
 
-        public MtgAPI()
+        public MtgAPI(PlayerEnvironment playerEnvironment)
         {
             _wc = new WebClient();
+            _accountSystemId = playerEnvironment.ClientId;
+            _accountSystemSecret = playerEnvironment.ClientId;
         }
 
         /// <summary>

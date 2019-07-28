@@ -1,11 +1,8 @@
-﻿using System;
-using System.Net;
-using System.Security;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace mtgalib
+namespace mtgalib.Player
 {
-    public class Credentials
+    public class PlayerCredentials
     {
 
         private MtgAPI _api = new MtgAPI();
@@ -17,13 +14,13 @@ namespace mtgalib
         public string PersonaId { get; private set; }
 
 
-        public Credentials(string username, string password)
+        public PlayerCredentials(string username, string password)
         {
             _username = username;
             _password = password;
         }
 
-        public Credentials(string refreshToken)
+        public PlayerCredentials(string refreshToken)
         {
             RefreshToken = refreshToken;
         }
