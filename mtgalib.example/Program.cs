@@ -40,20 +40,27 @@ namespace mtgalib.example
             MtgaServer server = new MtgaServer(environment);
 
             // Register event handlers
-            server.SetOnMsgSentAction((bytes, offset, count) => Console.WriteLine("-> " + Encoding.UTF8.GetString(bytes, offset, count)));
-            server.SetOnMsgReceivedAction((bytes, offset, count) => Console.WriteLine("<- " + Encoding.UTF8.GetString(bytes, offset, count)));
-
+            server.SetOnMsgSentEvent((bytes, offset, count) => Console.WriteLine("-> " + Encoding.UTF8.GetString(bytes, offset, count)));
+            server.SetOnMsgReceivedEvent((bytes, offset, count) => Console.WriteLine("<- " + Encoding.UTF8.GetString(bytes, offset, count)));
+            server.SetOnConnectedEvent(b => Console.WriteLine("Connected"));
+            server.SetOnConnectionClosedEvent(s => Console.WriteLine("Disconnected. Reason: " + s));
 
             // Connect to server
             Console.WriteLine("Connecting to server...");
-            bool connected = await server.ConnectTask();
-            if (connected)
-                Console.WriteLine("Connected!");
+            await server.ConnectTask();
 
             // Authenticate user
             await server.AuthenticateAsyncTask(_ticket);
             JsonRpcResponse response = await server.ReadResponseTask();
             Console.WriteLine("Session id: " + response.result.GetPayloadValue<string>("sessionId"));
+
+            server.Ping();
+            response = await server.ReadResponseTask();
+            Console.WriteLine(response.result);
+
+            server.Derp();
+            response = await server.ReadResponseTask();
+            Console.WriteLine(response.result);
 
         }
 
