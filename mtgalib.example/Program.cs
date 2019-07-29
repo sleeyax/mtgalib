@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using mtgalib.Local;
 using mtgalib.Player;
 using mtgalib.Server;
 
@@ -14,14 +15,16 @@ namespace mtgalib.example
 
         static void Main(string[] args)
         {
-            // PlayerCredentials credentials = new PlayerCredentials("token");
-            PlayerCredentials credentials = new PlayerCredentials("username", "password");
+            InstalledGame installedGame = new InstalledGame("D:\\Games\\MTGA");
+            PlayerCredentials credentials = new PlayerCredentials(installedGame.GetRefreshToken());
+            // PlayerCredentials credentials = new PlayerCredentials("username", "password");
             Console.WriteLine("Authenticating...");
             bool verified = credentials.VerifyAsyncTask().GetAwaiter().GetResult();
             if (verified)
             {
                 Console.WriteLine("Logged in!");
                 _ticket = credentials.AccessToken;
+                installedGame.SaveRefreshToken(credentials.RefreshToken);
             }
             else
             {
