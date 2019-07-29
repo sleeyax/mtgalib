@@ -47,6 +47,7 @@
     <Compile Include="Endpoint\BaseEndpoint.cs" />
     <Compile Include="Endpoint\MtgAssetsEndpoint.cs" />
     <Compile Include="Endpoint\MtgDownloadsEndpoint.cs" />
+    <Compile Include="Local\InstalledGame.cs" />
     <Compile Include="Player\PlayerCredentials.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="Endpoint\MtgAPI.cs" />
