@@ -58,11 +58,10 @@ namespace mtgalib.Server
 
         public void Disconnect()
         {
-            if (_tcpConnection.Connected)
-                _tcpConnection.Close();
+            _tcpConnection.Close();
         }
 
-        public Task<JsonRpcResponse> ReadResponseTask()
+        private Task<JsonRpcResponse> ReadResponseTask()
         {
             TaskCompletionSource<JsonRpcResponse> taskCompletionSource = new TaskCompletionSource<JsonRpcResponse>();
             Action<byte[], int, int> action = (bytes, offset, length) =>
@@ -76,12 +75,12 @@ namespace mtgalib.Server
             return taskCompletionSource.Task;
         }
 
-        public void Send(string message)
+        private void Send(string message)
         {
             _tcpConnection.SendAsync(Encoding.UTF8.GetBytes(message));
         }
 
-        public void SendRPC(string method, JToken parameters)
+        public async Task<JsonRpcResponse> SendRpcJsonAsyncTask(string method, JToken parameters)
         {
             JObject rpcRequest = new JObject
             {
@@ -91,36 +90,38 @@ namespace mtgalib.Server
                 {"id", (_messagesSentCounter++).ToString()}
             };
             Send(JsonConvert.SerializeObject(rpcRequest));
+
+            return await ReadResponseTask();
         }
 
-        public void Authenticate(string ticket, string clientVersion)
+        public async Task<JsonRpcResponse> AuthenticateAsyncTask(string ticket, string clientVersion)
         {
-            SendRPC("Authenticate", new JObject
+            return await SendRpcJsonAsyncTask("Authenticate", new JObject
             {
                 {"ticket", ticket},
                 {"clientVersion", clientVersion}
             });
         }
 
-        public void Authenticate(string ticket, Version clientVersion)
+        public async Task<JsonRpcResponse> AuthenticateAsyncTask(string ticket, Version clientVersion)
         {
-            Authenticate(ticket, $"{clientVersion.Patch}.{clientVersion.Meta}");
+            return await AuthenticateAsyncTask(ticket, $"{clientVersion.Patch}.{clientVersion.Meta}");
         }
 
-        public async Task AuthenticateAsyncTask(string ticket)
+        public async Task<JsonRpcResponse> AuthenticateAsyncTask(string ticket)
         {
             string clientVersion = await new MtgDownloadsEndpoint().GetClientVersionAsyncTask(MtgDownloadsEndpoint.PLATFORM_WINDOWS);
-            Authenticate(ticket, new Version(clientVersion));
+            return await AuthenticateAsyncTask(ticket, new Version(clientVersion));
         }
 
-        public void Ping()
+        public async Task<JsonRpcResponse> PingAsyncTask()
         {
-            SendRPC("FrontDoor.Ping", new JObject());
+            return await SendRpcJsonAsyncTask("FrontDoor.Ping", new JObject());
         }
 
-        public void Derp()
+        public async Task<JsonRpcResponse> DerpAsyncTask()
         {
-            SendRPC("Derp", new JObject());
+            return await SendRpcJsonAsyncTask("Derp", new JObject());
         }
     }
 }

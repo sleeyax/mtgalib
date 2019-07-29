@@ -50,17 +50,14 @@ namespace mtgalib.example
             await server.ConnectTask();
 
             // Authenticate user
-            await server.AuthenticateAsyncTask(_ticket);
-            JsonRpcResponse response = await server.ReadResponseTask();
+            JsonRpcResponse response = await server.AuthenticateAsyncTask(_ticket);
             Console.WriteLine("Session id: " + response.result.GetPayloadValue<string>("sessionId"));
 
-            server.Ping();
-            response = await server.ReadResponseTask();
-            Console.WriteLine(response.result);
+            response = await server.PingAsyncTask();
+            Console.WriteLine(response.result.GetPayloadValue());
 
-            server.Derp();
-            response = await server.ReadResponseTask();
-            Console.WriteLine(response.result);
+            response = await server.DerpAsyncTask();
+            Console.WriteLine(response.error.message);
 
         }
 
