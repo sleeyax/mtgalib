@@ -12,6 +12,11 @@ namespace mtgalib.Server
         {
             return payload.Value<T>(key);
         }
+
+        public string GetPayloadValue()
+        {
+            return payload.ToString();
+        }
     }
 
     public class JsonRpcResponseError
