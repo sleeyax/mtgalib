@@ -6,7 +6,7 @@ namespace mtgalib.Player
     public class PlayerCredentials
     {
         private readonly string _password;
-        private readonly string _username;
+        private readonly string _email;
 
         public string RefreshToken { get; private set; }
         public string AccessToken { get; private set; }
@@ -14,9 +14,9 @@ namespace mtgalib.Player
         public string PersonaId { get; private set; }
 
 
-        public PlayerCredentials(string username, string password)
+        public PlayerCredentials(string email, string password)
         {
-            _username = username;
+            _email = email;
             _password = password;
         }
 
@@ -29,7 +29,7 @@ namespace mtgalib.Player
         {
             MtgAPI api = new MtgAPI(PlayerEnvironment.GetEnvironment());
 
-            dynamic jsonResponse = RefreshToken != null ? await api.LoginAsyncTask(RefreshToken) : await api.LoginAsyncTask(_username, _password);
+            dynamic jsonResponse = RefreshToken != null ? await api.LoginAsyncTask(RefreshToken) : await api.LoginAsyncTask(_email, _password);
 
             if (jsonResponse.code == 401)
                 return false;
