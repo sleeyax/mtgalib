@@ -7,15 +7,16 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using Newtonsoft.Json.Linq;
 
 namespace mtgalib.Server
 {
     internal class TcpConnection
     {
-        public Action<TcpConnectionCloseType> OnClose;
-        public Action<bool> OnConnected;
-        public Action<byte[], int, int> OnMsgReceived;
-        public Action<byte[], int, int> OnMsgSent;
+        public event Action<string> OnClose;
+        public event Action<bool> OnConnected;
+        public event Action<byte[], int, int> OnMsgReceived;
+        public event Action<byte[], int, int> OnMsgSent;
         public string ConnectionStatus { get; private set; }
         public bool Connected => _socket != null && _socket.Connected;
 
@@ -62,7 +63,7 @@ namespace mtgalib.Server
         /// Close all active connections
         /// </summary>
         /// <param name="closeType"></param>
-        public void Close(TcpConnectionCloseType closeType = TcpConnectionCloseType.Expected)
+        public void Close(TcpConnectionCloseType closeType = TcpConnectionCloseType.Expected, string reason = "Normal close event")
         {
             if (_socket != null)
             {
@@ -81,7 +82,7 @@ namespace mtgalib.Server
             
             _stopSendThread = true;
 
-            OnClose?.Invoke(closeType);
+            OnClose?.Invoke(reason);
         }
 
         private void TranslateHostToIP(IPHostEntry entry)
@@ -90,8 +91,9 @@ namespace mtgalib.Server
 
             if (ip == null)
             {
-                Close(TcpConnectionCloseType.Unexpected);
-                throw new Exception("Failed to translate server hostname to IP address");
+                string reason = "Failed to translate server hostname to IP address";
+                Close(TcpConnectionCloseType.Unexpected, reason);
+                throw new Exception(reason);
             }
 
             // Connect to server using socket
@@ -117,7 +119,7 @@ namespace mtgalib.Server
             // Double-check if the connection was successful
             if (connectEventArgs.SocketError != SocketError.Success)
             {
-                Close(TcpConnectionCloseType.Unexpected);
+                Close(TcpConnectionCloseType.Unexpected, "Connection closed for no reason");
                 throw new Exception("Connection closed for no reason");
             }
 
@@ -133,7 +135,7 @@ namespace mtgalib.Server
             }
             catch (Exception ex)
             {
-                Close(TcpConnectionCloseType.Unexpected);
+                Close(TcpConnectionCloseType.Unexpected, "SSL authentication failed");
                 throw new Exception("SSL authentication failed", ex);
             }
         }
@@ -146,13 +148,13 @@ namespace mtgalib.Server
             }
             catch (Exception)
             {
-                Close(TcpConnectionCloseType.Unexpected);
+                Close(TcpConnectionCloseType.Unexpected, "Unknown error occurred while authenticating SSL connection");
                 throw new Exception("Unknown error occurred while authenticating SSL connection");
             }
 
             if (!_ssl.IsEncrypted || !_ssl.IsSigned)
             {
-                Close(TcpConnectionCloseType.Unexpected);
+                Close(TcpConnectionCloseType.Unexpected, "SSL connection not encrypted or signed!");
                 throw new Exception("SSL connection not encrypted or signed!");
             }
 
@@ -209,7 +211,7 @@ namespace mtgalib.Server
                     }
                     catch (Exception ex)
                     {
-                        Close(TcpConnectionCloseType.Unexpected);
+                        Close(TcpConnectionCloseType.Unexpected, "Unexpected error while trying to send next message in queue");
                         throw new Exception("Unexpected error while trying to send next message in queue", ex);
                     }
                 }
@@ -218,9 +220,10 @@ namespace mtgalib.Server
 
         private void TrySendNextMsg()
         {
+            
             if (_stopSendThread)
                 return;
-            
+
             if (_outgoingMessageRemainingBytes == 0)
             {
                 _canSend = _msgSendQueue.TryDequeue(out _outgoingMessage);
@@ -263,7 +266,7 @@ namespace mtgalib.Server
             }
             catch (Exception ex)
             {
-                Close(TcpConnectionCloseType.Unexpected);
+                Close(TcpConnectionCloseType.Unexpected, "Error when writing to SSL stream");
                 throw new Exception("Error when writing to SSL stream", ex);
             }
         }
@@ -276,7 +279,7 @@ namespace mtgalib.Server
             }
             catch (Exception ex)
             {
-                Close(TcpConnectionCloseType.Unexpected);
+                Close(TcpConnectionCloseType.Unexpected, "Error when reading from SSL stream");
                 throw new Exception("Error when reading from SSL stream", ex);
             }
         }
@@ -290,7 +293,7 @@ namespace mtgalib.Server
             }
             catch (Exception ex)
             {
-                Close(TcpConnectionCloseType.Unexpected);
+                Close(TcpConnectionCloseType.Unexpected, "Error when reading from SSL stream");
                 throw new Exception("Error when reading from SSL stream", ex);
             }
         }
@@ -302,11 +305,11 @@ namespace mtgalib.Server
             _incomingMsgLen = -1;
         }
 
-        private void ProcessReceive(int bytesTransferred, byte[] buffer)
+        private void ProcessReceive(int bytesTransferred, byte[] buffer, bool isTest = false)
         {
             if (bytesTransferred == 0)
             {
-                Close();
+                Close(TcpConnectionCloseType.Expected, "Closed by remote end");
                 return;
             }
 
@@ -321,10 +324,11 @@ namespace mtgalib.Server
             {
                 if (_incomingMsgLen == -1)
                 {
-                    if (_incomingMsgVersion != 1)
+                    byte incomingMsgVersion = _incomingMsgVersion;
+                    if (incomingMsgVersion != 1)
                     {
-                        Close(TcpConnectionCloseType.InvalidMessageFormat);
-                        throw new Exception("Unsupported Msg Version");
+                        Close(TcpConnectionCloseType.InvalidMessageFormat, "Received message has an invalid format");
+                        return;
                     }
 
                     if (_incomingMsgBytesReceived > 4)
@@ -335,27 +339,27 @@ namespace mtgalib.Server
                             Array.Resize(ref _recvBuffer, _incomingMsgLen + 5);
                         }
                     }
+
                     if (_incomingMsgLen == -1)
                     {
-                        StartRead(_incomingMsgBytesReceived);
+                        goto read;
                     }
                 }
 
                 int num = _incomingMsgLen + 5;
                 if (_incomingMsgBytesReceived < num)
                 {
-                    StartRead(_incomingMsgBytesReceived);
+                    goto read;
                 }
+
                 if (_incomingMsgBytesReceived >= num)
                 {
                     OnMsgReceived?.Invoke(_recvBuffer, 5, _incomingMsgLen);
                     int num2 = 5 + _incomingMsgLen;
                     if (_incomingMsgBytesReceived <= num2)
                     {
-                        ResetPending();
-                        break;
+                        goto reset;
                     }
-
                     int num3 = _incomingMsgBytesReceived - num2;
                     Array.Copy(_recvBuffer, num2, _recvBuffer, 0, num3);
                     ResetPending();
@@ -363,6 +367,10 @@ namespace mtgalib.Server
                     _incomingMsgBytesReceived = num3;
                 }
             }
+            reset:
+            ResetPending();
+            read:
+            StartRead(_incomingMsgBytesReceived);
         }
     }
 }
