@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using mtgalib.Endpoint;
 using mtgalib.Player;
@@ -11,9 +15,9 @@ namespace mtgalib.Server
 {
     public class MtgaServer
     {
-        private TcpConnection _tcpConnection;
-        private string _host;
-        private int _port;
+        private readonly TcpConnection _tcpConnection;
+        private readonly string _host;
+        private readonly int _port;
         private int _messagesSentCounter;
 
         public MtgaServer(PlayerEnvironment playerEnvironment)
@@ -23,33 +27,31 @@ namespace mtgalib.Server
             _port = playerEnvironment.Port;
         }
 
-        public Task<bool> ConnectTask()
-        {
-            _tcpConnection.Connect(_host, _port);
-            TaskCompletionSource<bool> taskCompletionSource = new TaskCompletionSource<bool>();
-            _tcpConnection.OnConnected = b => taskCompletionSource.SetResult(b);
-
-            return taskCompletionSource.Task;
-        }
-
-        public void SetOnMsgSentAction(Action<byte[], int, int> action)
+        public void SetOnMsgSentEvent(Action<byte[], int, int> action)
         {
             _tcpConnection.OnMsgSent += action;
         }
 
-        public void SetOnMsgReceivedAction(Action<byte[], int, int> action)
+        public void SetOnMsgReceivedEvent(Action<byte[], int, int> action)
         {
             _tcpConnection.OnMsgReceived += action;
         }
 
-        public Task<JsonRpcResponse> ReadResponseTask()
+        public void SetOnConnectionClosedEvent(Action<string> action)
         {
-            TaskCompletionSource<JsonRpcResponse> taskCompletionSource = new TaskCompletionSource<JsonRpcResponse>();
-            _tcpConnection.OnMsgReceived += (bytes, offset, length) =>
-            {
-                string msg = Encoding.UTF8.GetString(bytes, offset, length);
-                taskCompletionSource.SetResult(JsonConvert.DeserializeObject<JsonRpcResponse>(msg));
-            };
+            _tcpConnection.OnClose += action;
+        }
+
+        public void SetOnConnectedEvent(Action<bool> action)
+        {
+            _tcpConnection.OnConnected += action;
+        }
+
+        public Task<bool> ConnectTask()
+        {
+            _tcpConnection.Connect(_host, _port);
+            TaskCompletionSource<bool> taskCompletionSource = new TaskCompletionSource<bool>();
+            _tcpConnection.OnConnected += b => taskCompletionSource.SetResult(b);
 
             return taskCompletionSource.Task;
         }
@@ -60,9 +62,35 @@ namespace mtgalib.Server
                 _tcpConnection.Close();
         }
 
-        private void Send(string message)
+        public Task<JsonRpcResponse> ReadResponseTask()
+        {
+            TaskCompletionSource<JsonRpcResponse> taskCompletionSource = new TaskCompletionSource<JsonRpcResponse>();
+            Action<byte[], int, int> action = (bytes, offset, length) =>
+            {
+                string msg = Encoding.UTF8.GetString(bytes, offset, length);
+                taskCompletionSource.SetResult(JsonConvert.DeserializeObject<JsonRpcResponse>(msg));
+            };
+            _tcpConnection.OnMsgReceived += action;
+            // Remove event handler when the task finishes
+            taskCompletionSource.Task.ContinueWith(t => _tcpConnection.OnMsgReceived -= action);
+            return taskCompletionSource.Task;
+        }
+
+        public void Send(string message)
         {
             _tcpConnection.SendAsync(Encoding.UTF8.GetBytes(message));
+        }
+
+        public void SendRPC(string method, JToken parameters)
+        {
+            JObject rpcRequest = new JObject
+            {
+                {"jsonrpc", "2.0"},
+                {"method", method},
+                {"params", parameters},
+                {"id", (_messagesSentCounter++).ToString()}
+            };
+            Send(JsonConvert.SerializeObject(rpcRequest));
         }
 
         public void Authenticate(string ticket, string clientVersion)
@@ -76,11 +104,7 @@ namespace mtgalib.Server
 
         public void Authenticate(string ticket, Version clientVersion)
         {
-            SendRPC("Authenticate", new JObject
-            {
-                {"ticket", ticket},
-                {"clientVersion", $"{clientVersion.Patch}.{clientVersion.Meta}"}
-            });
+            Authenticate(ticket, $"{clientVersion.Patch}.{clientVersion.Meta}");
         }
 
         public async Task AuthenticateAsyncTask(string ticket)
@@ -89,16 +113,14 @@ namespace mtgalib.Server
             Authenticate(ticket, new Version(clientVersion));
         }
 
-        private void SendRPC(string method, JToken parameters)
+        public void Ping()
         {
-            JObject rpcRequest = new JObject
-            {
-                {"jsonrpc", "2.0"},
-                {"method", method},
-                {"params", parameters},
-                {"id", (_messagesSentCounter++).ToString()}
-            };
-            Send(JsonConvert.SerializeObject(rpcRequest));
+            SendRPC("FrontDoor.Ping", new JObject());
+        }
+
+        public void Derp()
+        {
+            SendRPC("Derp", new JObject());
         }
     }
 }
