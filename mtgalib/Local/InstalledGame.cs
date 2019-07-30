@@ -55,8 +55,14 @@ namespace mtgalib.Local
         {
             try
             {
-                string versionFile = Path.Combine(_gameDir, "version");
+                string versionFile = Path.Combine(_gameDir, "build.changelist");
+
+                if (File.Exists(versionFile))
+                    return File.ReadAllText(versionFile);
+                
+                versionFile = Path.Combine(_gameDir, "version");
                 var json = JsonConvert.DeserializeObject<MtgDownloadsEndpoint.VersionResponseJson>(File.ReadAllText(versionFile));
+
                 return json.Versions.Keys.Max();
             }
             catch (Exception)
