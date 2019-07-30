@@ -48,6 +48,30 @@ namespace mtgalib.Local
         }
 
         /// <summary>
+        /// Deletes stored refresh token from the registry
+        /// </summary>
+        /// <returns></returns>
+        public bool DeleteRefreshToken()
+        {
+            try
+            {
+                using (var key = Registry.CurrentUser.OpenSubKey("Software\\Wizards Of The Coast\\MTGA", true))
+                {
+                    if (key?.GetValue("WAS-RefreshToken_h992839947") == null)
+                        return false;
+
+                    key.DeleteSubKey("WAS-RefreshToken_h992839947");
+                    return true;
+
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Reads stored version information and returns the current version of the installed game client
         /// </summary>
         /// <returns></returns>
