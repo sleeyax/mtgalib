@@ -1,6 +1,10 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Text;
 using Microsoft.Win32;
+using mtgalib.Endpoint;
+using Newtonsoft.Json;
 
 namespace mtgalib.Local
 {
@@ -40,6 +44,24 @@ namespace mtgalib.Local
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Reads stored version information and returns the current version of the installed game client
+        /// </summary>
+        /// <returns></returns>
+        public string GetVersion()
+        {
+            try
+            {
+                string versionFile = Path.Combine(_gameDir, "version");
+                var json = JsonConvert.DeserializeObject<MtgDownloadsEndpoint.VersionResponseJson>(File.ReadAllText(versionFile));
+                return json.Versions.Keys.Max();
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
     }

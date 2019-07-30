@@ -22,7 +22,7 @@ namespace mtgalib.Endpoint
             return json.Versions.Keys.Max();
         }
 
-        private class VersionResponseJson
+        internal class VersionResponseJson
         {
             public Dictionary<string, string> Versions { get; set; }
             public string Name { get; set; }

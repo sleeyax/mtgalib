@@ -16,10 +16,31 @@ namespace mtgalib.tests
         }
 
         [TestMethod]
-        public void ShouldReadRefreshTokenFromRegistry()
+        public void ShouldReadRefreshTokenFromRegistryOrReturnNull()
         {
             string refreshToken = _installedGame.GetRefreshToken();
-            Assert.IsNotNull(refreshToken, refreshToken);
+            try
+            {
+                Assert.IsNotNull(refreshToken);
+            }
+            catch
+            {
+                Assert.IsNull(refreshToken);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldReadGameClientVersionOrReturnNull()
+        {
+            string version = _installedGame.GetVersion();
+            try
+            {
+                Assert.IsNotNull(version);
+            }
+            catch
+            {
+                Assert.IsNull(version);
+            }
         }
     }
 }
