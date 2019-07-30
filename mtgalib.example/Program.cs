@@ -40,7 +40,7 @@ namespace mtgalib.example
         static async Task DoYourThing()
         {
             PlayerEnvironment environment = PlayerEnvironment.GetEnvironment(PlayerEnvironmentType.ProdB);
-            MtgaServer server = new MtgaServer(environment);
+            GameServer server = new GameServer(environment);
 
             // Register event handlers
             server.SetOnMsgSentEvent((bytes, offset, count) => Console.WriteLine("-> " + Encoding.UTF8.GetString(bytes, offset, count)));

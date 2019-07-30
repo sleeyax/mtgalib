@@ -1,6 +1,6 @@
 ﻿namespace mtgalib.Server
 {
-    public enum ServerErrorCode
+    public enum GameServerErrorCode
     {
         ParseError = -32700,
         InvalidRequest = -32600,

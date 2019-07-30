@@ -2,9 +2,8 @@
 
 namespace mtgalib
 {
-    public class Version
+    internal class Version
     {
-
         public string Major { get; set; }
         public string Minor { get; set; }
         public string Patch { get; set; }

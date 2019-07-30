@@ -13,14 +13,14 @@ using Newtonsoft.Json.Serialization;
 
 namespace mtgalib.Server
 {
-    public class MtgaServer
+    public class GameServer
     {
         private readonly TcpConnection _tcpConnection;
         private readonly string _host;
         private readonly int _port;
         private int _messagesSentCounter;
 
-        public MtgaServer(PlayerEnvironment playerEnvironment)
+        public GameServer(PlayerEnvironment playerEnvironment)
         {
             _tcpConnection = new TcpConnection();
             _host = playerEnvironment.Host;
@@ -103,7 +103,7 @@ namespace mtgalib.Server
             });
         }
 
-        public async Task<JsonRpcResponse> AuthenticateAsyncTask(string ticket, Version clientVersion)
+        private async Task<JsonRpcResponse> AuthenticateAsyncTask(string ticket, Version clientVersion)
         {
             return await AuthenticateAsyncTask(ticket, $"{clientVersion.Patch}.{clientVersion.Meta}");
         }
