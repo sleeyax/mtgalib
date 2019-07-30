@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using mtgalib.Endpoint;
+using mtgalib.Local;
 using mtgalib.Player;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -96,6 +97,12 @@ namespace mtgalib.Server
 
         public async Task<JsonRpcResponse> AuthenticateAsyncTask(string ticket, string clientVersion)
         {
+            if (clientVersion.Split('.').Length > 2)
+            {
+                Version version = new Version(clientVersion);
+                clientVersion = $"{version.Patch}.{version.Meta}";
+            }
+
             return await SendRpcJsonAsyncTask("Authenticate", new JObject
             {
                 {"ticket", ticket},
@@ -103,15 +110,10 @@ namespace mtgalib.Server
             });
         }
 
-        private async Task<JsonRpcResponse> AuthenticateAsyncTask(string ticket, Version clientVersion)
-        {
-            return await AuthenticateAsyncTask(ticket, $"{clientVersion.Patch}.{clientVersion.Meta}");
-        }
-
         public async Task<JsonRpcResponse> AuthenticateAsyncTask(string ticket)
         {
-            string clientVersion = await new MtgDownloadsEndpoint().GetClientVersionAsyncTask(MtgDownloadsEndpoint.PLATFORM_WINDOWS);
-            return await AuthenticateAsyncTask(ticket, new Version(clientVersion));
+            string clientVersion = await new MtgDownloadsEndpoint().GetLatestGameClientVersionAsyncTask(MtgDownloadsEndpoint.PLATFORM_WINDOWS);
+            return await AuthenticateAsyncTask(ticket, clientVersion);
         }
 
         public async Task<JsonRpcResponse> PingAsyncTask()

@@ -14,7 +14,7 @@ namespace mtgalib.Endpoint
             _url = "https://mtgarena.downloads.wizards.com";
         }
 
-        public async Task<string> GetClientVersionAsyncTask(string platform)
+        public async Task<string> GetLatestGameClientVersionAsyncTask(string platform)
         {
             string response = await _wc.DownloadStringTaskAsync($"{_url}/Live/{platform}/version");
             VersionResponseJson json = JsonConvert.DeserializeObject<VersionResponseJson>(response);
