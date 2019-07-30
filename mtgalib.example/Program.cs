@@ -62,6 +62,14 @@ namespace mtgalib.example
             response = await server.DerpAsyncTask();
             Console.WriteLine(response.error.message);
 
+            string cmd = "";
+            while (cmd != "q")
+            {
+                Console.Write(">> ");
+                cmd = Console.ReadLine();
+                Console.WriteLine(await server.SendAsyncTask(cmd));
+            }
+
         }
 
     }

@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -79,6 +80,12 @@ namespace mtgalib.Server
         private void Send(string message)
         {
             _tcpConnection.SendAsync(Encoding.UTF8.GetBytes(message));
+        }
+
+        public async Task<JsonRpcResponse> SendAsyncTask(string message)
+        {
+            Send(message);
+            return await ReadResponseTask();
         }
 
         public async Task<JsonRpcResponse> SendRpcJsonAsyncTask(string method, JToken parameters)
