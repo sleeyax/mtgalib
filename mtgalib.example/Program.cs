@@ -62,7 +62,11 @@ namespace mtgalib.example
             response = await server.DerpAsyncTask();
             Console.WriteLine(response.error.message);
 
-
+            response = await server.RedeemCodeAsyncTask( _ticket,"abc");
+            if (response.error != null)
+            {
+                Console.WriteLine("Failed to redeem code: " + response.error.message);
+            }
         }
 
     }

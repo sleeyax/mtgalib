@@ -7,7 +7,8 @@ namespace mtgalib.Player
     public class PlayerEnvironment
     {
         public string Name { get; set; }
-        public PlayerEnvironmentType EnvironmentType { get; set; }
+        public string NameHumanReadable { get; set; }
+        public PlayerEnvironmentType Type { get; set; }
         public string Host { get; set; }
         public int Port { get; set; }
         public string ClientId { get; set; }
@@ -20,8 +21,9 @@ namespace mtgalib.Player
                 case PlayerEnvironmentType.Beta:
                     return new PlayerEnvironment
                     {
-                        Name = "Beta",
-                        EnvironmentType = environmentType,
+                        Name = "QATrunk",
+                        NameHumanReadable = "Beta",
+                        Type = environmentType,
                         Host = "client-arena-deva-game.mtgabetasfexplorer.com",
                         Port = 9411,
                         ClientId = "YBGWRYBSNLGIJGNOISDN",
@@ -30,8 +32,9 @@ namespace mtgalib.Player
                 case PlayerEnvironmentType.Developer:
                     return new PlayerEnvironment
                     {
-                        Name = "Developer",
-                        EnvironmentType = environmentType,
+                        Name = "QADev",
+                        NameHumanReadable = "Developer",
+                        Type = environmentType,
                         Host = "devgamesfc.mtgabeta.com",
                         Port = 9411,
                         ClientId = "YBGWRYBSNLGIJGNOISDN",
@@ -40,8 +43,9 @@ namespace mtgalib.Player
                 case PlayerEnvironmentType.ProdA:
                     return new PlayerEnvironment
                     {
-                        Name = "Production A",
-                        EnvironmentType = environmentType,
+                        Name = "ProdA",
+                        NameHumanReadable = "Production A",
+                        Type = environmentType,
                         Host = "client.arenagame-a.east.magic-the-gathering-arena.com",
                         Port = 9405,
                         ClientId = "N8QFG8NEBJ5T35FB",
@@ -50,8 +54,9 @@ namespace mtgalib.Player
                 case PlayerEnvironmentType.ProdB:
                     return new PlayerEnvironment
                     {
-                        Name = "Production B",
-                        EnvironmentType = environmentType,
+                        Name = "ProdB",
+                        NameHumanReadable = "Production B",
+                        Type = environmentType,
                         Host = "client.arenagame-b.east.magic-the-gathering-arena.com",
                         Port = 9405,
                         ClientId = "N8QFG8NEBJ5T35FB",

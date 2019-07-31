@@ -20,6 +20,7 @@ namespace mtgalib.Server
         private readonly TcpConnection _tcpConnection;
         private readonly string _host;
         private readonly int _port;
+        private readonly string _envName;
         private int _messagesSentCounter;
 
         public GameServer(PlayerEnvironment playerEnvironment)
@@ -27,6 +28,7 @@ namespace mtgalib.Server
             _tcpConnection = new TcpConnection();
             _host = playerEnvironment.Host;
             _port = playerEnvironment.Port;
+            _envName = playerEnvironment.Name;
         }
 
         public void SetOnMsgSentEvent(Action<byte[], int, int> action)
@@ -131,6 +133,16 @@ namespace mtgalib.Server
         public async Task<JsonRpcResponse> DerpAsyncTask()
         {
             return await SendRpcJsonAsyncTask("Derp", new JObject());
+        }
+
+        public async Task<JsonRpcResponse> RedeemCodeAsyncTask(string ticket, string code)
+        {
+            return await SendRpcJsonAsyncTask("Code.Redeem", new JObject
+            {
+                {"ticket", ticket},
+                {"code", code},
+                {"envKey", _envName}
+            });
         }
     }
 }
