@@ -94,5 +94,17 @@ namespace mtgalib.Local
                 return null;
             }
         }
+
+        public string GetProdUri()
+        {
+            string appdataLocal = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string appdataLocalLow = Path.Combine(Path.Combine(appdataLocal, ".."), "LocalLow");
+            string prodUri = Path.Combine(appdataLocalLow, "Wizards Of The Coast\\MTGA\\prodUri.txt");
+
+            if (!File.Exists(prodUri))
+                return null;
+
+            return File.ReadAllText(prodUri);
+        }
     }
 }
