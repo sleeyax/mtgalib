@@ -144,5 +144,14 @@ namespace mtgalib.Server
                 {"envKey", _envName}
             });
         }
+
+        public async Task<JsonRpcResponse> PurchaseProductAsyncTask(string productId, int quantity)
+        {
+            return await SendRpcJsonAsyncTask("Mercantile.PurchaseProduct", new JObject
+            {
+                {"productId", productId},
+                {"quantity", quantity}
+            });
+        }
     }
 }
