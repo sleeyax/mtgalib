@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using mtgalib.Endpoint;
+using mtgalib.Local;
 
 namespace mtgalib.Player
 {
@@ -67,11 +68,8 @@ namespace mtgalib.Player
             }
         }
 
-        public static async Task<PlayerEnvironment> GetDefaultEnvironmentAsyncTask()
+        private static PlayerEnvironment GetEnvironment(string prodUri)
         {
-            // Download default ProdUri from the MTGA assets endpoint
-            MtgAssetsEndpoint assetsEndpoint = new MtgAssetsEndpoint();
-            string prodUri = await assetsEndpoint.GetProdUriAsyncTask();
             var uri = new WebSocketUri(prodUri);
 
             // It should be Prod A or B
@@ -87,7 +85,32 @@ namespace mtgalib.Player
             {
                 throw new Exception($"No environment found for prodUri '{prodUri}'");
             }
+        }
 
+        /// <summary>
+        /// Returns the default player environment from an online endpoint
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<PlayerEnvironment> GetDefaultEnvironmentAsyncTask()
+        {
+            // Download default ProdUri from the MTGA assets endpoint
+            MtgAssetsEndpoint assetsEndpoint = new MtgAssetsEndpoint();
+            string prodUri = await assetsEndpoint.GetProdUriAsyncTask();
+
+            return GetEnvironment(prodUri);
+        }
+
+        /// <summary>
+        /// Returns the current player environment from locally stored information.  
+        /// </summary>
+        /// <param name="defaultTo"></param>
+        /// <returns></returns>
+        public static PlayerEnvironment GetCurrentEnvironment(PlayerEnvironmentType defaultsTo = PlayerEnvironmentType.ProdB)
+        {
+            InstalledGame installedGame = new InstalledGame("");
+            string prodUri = installedGame.GetProdUri();
+
+            return prodUri == null ? GetEnvironment(defaultsTo) : GetEnvironment(prodUri);
         }
     }
 }
