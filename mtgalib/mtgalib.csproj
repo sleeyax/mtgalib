@@ -60,6 +60,7 @@
     <Compile Include="Server\TcpConnection.cs" />
     <Compile Include="Server\TcpConnectionCloseType.cs" />
     <Compile Include="Version.cs" />
+    <Compile Include="WebSocketUri.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

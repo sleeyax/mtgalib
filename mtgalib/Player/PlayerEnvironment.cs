@@ -72,15 +72,14 @@ namespace mtgalib.Player
             // Download default ProdUri from the MTGA assets endpoint
             MtgAssetsEndpoint assetsEndpoint = new MtgAssetsEndpoint();
             string prodUri = await assetsEndpoint.GetProdUriAsyncTask();
-            prodUri = prodUri.Replace("wss://", "").Replace("ws://", "").ToLower();
-            string[] parts = prodUri.Split('/');
+            var uri = new WebSocketUri(prodUri);
 
             // It should be Prod A or B
-            if (parts[0].Contains("arenagame-b") && parts[1] == "prod")
+            if (uri.Host.Contains("arenagame-b"))
             {
                 return GetEnvironment(PlayerEnvironmentType.ProdB);
             }
-            else if (parts[0].Contains("arenagame-a") && parts[1] == "prod")
+            else if (uri.Host.Contains("arenagame-a"))
             {
                 return GetEnvironment(PlayerEnvironmentType.ProdA);
             }
